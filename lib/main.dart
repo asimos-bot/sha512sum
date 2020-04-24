@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'panel.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(MyApp());
 
@@ -32,19 +31,7 @@ class MyApp extends StatelessWidget {
             )
           )
         ),
-        body: Panel(),
-        bottomNavigationBar: BottomAppBar(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: GestureDetector(
-              onTap: () => launch('https://gitlab.com/asimos-bot/sha512sum'),
-              child: Text(
-                  'Click here to view the project in Github! \U0000270D',
-                  textAlign: TextAlign.center,
-              )
-            )
-          )
-        )
+        body: Panel()
       )
     );
   }
