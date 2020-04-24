@@ -13,10 +13,28 @@ class PanelState extends State<Panel> {
 
   final _controller = TextEditingController();
 
-  String hash="Your Sha512sum result will be shown here";
+  final hintText = "Your Sha512sum result will be shown here";
+
+  String hash;
+  int hashSize=128;
+
+  PanelState() {
+    hash = hintText;
+  }
+
+  bool passwd=true;
 
   //update saved hash value
-  void updateHash() => setState(() => hash = sha512.convert(utf8.encode(_controller.text)).toString());
+  void updateHash() {
+
+    setState(() {
+
+      if( _controller.text != "" )
+        hash = sha512.convert(utf8.encode(_controller.text)).toString().substring(0,hashSize);
+      else
+        hash = hintText;
+    });
+  }
 
   //add Listener that will update the hash everytime we type
   void initState() {
@@ -78,18 +96,52 @@ class PanelState extends State<Panel> {
 
             //where we put the content to be hashed
             Padding(
-                padding: EdgeInsets.all(20.0),
-                child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                                Radius.circular(30)
-                            )
-                        ),
-                        hintText: 'text to hash'
-                    )
+              padding: EdgeInsets.all(0.0),
+              child: ListTile(
+                leading: IconButton(
+                  icon: Icon(Icons.delete_outline),
+                  onPressed: () => _controller.text = ""
+                ),
+                trailing: IconButton(
+                  icon: Icon( passwd ? Icons.panorama_fish_eye : Icons.remove_circle_outline),
+                  onPressed: () => setState(() => passwd = !passwd)
+                ),
+                title: TextField(
+                  obscureText: passwd,
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20)
+                      )
+                    ),
+                    hintText: 'text to hash'
+                  )
                 )
+              )
+            ),
+
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Slider(
+                min: 1,
+                max: 128,
+                onChanged: (newValue) {
+                  hashSize = newValue.round();
+                  updateHash();
+                },
+                value: hashSize.toDouble()
+              )
+            ),
+
+            Text(
+              '${hashSize}',
+              textAlign: TextAlign.center,
+              textScaleFactor: 2,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Open Sans'
+              ),
             )
 
           ],
