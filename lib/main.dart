@@ -29,7 +29,19 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.grey,
       ),
-      home: Panel('Sha512Sum')
+      home: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          title: Center(
+            child: Text(
+              'Sha512Sum',
+              textScaleFactor: 1.5,
+              textAlign: TextAlign.center
+            )
+          )
+        ),
+        body: Panel()
+      )
     );
   }
 }

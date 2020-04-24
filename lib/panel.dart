@@ -1,66 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'controller.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 class Panel extends StatefulWidget {
 
-  final navbarTitle;
-
-  Panel(this.navbarTitle);
-
   @override
-  createState() => PanelState(navbarTitle);
+  createState() => PanelState();
 }
 
 class PanelState extends State<Panel> {
 
-  final navbarTitle;
-  final hasher = Hasher();
+  final _controller = TextEditingController();
 
-  PanelState(this.navbarTitle);
+  String hash="Your Sha512sum result will be shown here";
 
-  void dispose(){
+  //update saved hash value
+  void updateHash() => setState(() => hash = sha512.convert(utf8.encode(_controller.text)).toString());
 
-    hasher.dispose();
+  //add Listener that will update the hash everytime we type
+  void initState() {
 
+    _controller.addListener(updateHash);
+    super.initState();
+  }
+  //dispose controller
+  void dispose() {
+
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context){
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Center(
-          child: Text(
-            navbarTitle,
-            textScaleFactor: 1.5,
-            textAlign: TextAlign.center
-          )
-        )
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Center(
+        child: ListView(
           children: <Widget>[
 
-            //where we put the content to be hashed
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: TextField(
-                controller: hasher.getController(),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30)
-                    )
-                  ),
-                  hintText: 'text to hash'
-                )
-              )
-            ),
             //display the hash
             Padding(
               padding: EdgeInsets.all(20.0),
@@ -72,10 +49,20 @@ class PanelState extends State<Panel> {
                   padding: EdgeInsets.all(20.0),
                   child: Container(
                     child: InkWell(
-                      onTap: () => Clipboard.setData(ClipboardData(text: hasher.getHash())),
+                      onTap: () => Clipboard.setData(ClipboardData(text: hash)).then((result){
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text('Copied to Clipboard'),
+                          duration: Duration(seconds: 3),
+                        ));
+                      }).catchError((error) {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text('Error: Couldn\'t copy to Clipboard'),
+                          duration: Duration(seconds: 3),
+                        ));
+                      }),
                       child: ListTile(
                         title: Text(
-                          hasher.getHash(),
+                          hash,
                           textAlign: TextAlign.center,
                         ),
                         subtitle: Text(
@@ -89,26 +76,25 @@ class PanelState extends State<Panel> {
               )
             ),
 
-            //main button, when pressed the hash is displayed below
+            //where we put the content to be hashed
             Padding(
                 padding: EdgeInsets.all(20.0),
-                child:RaisedButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0)
-                    ),
-                    onPressed: () => setState(() {
-                      hasher.updateHash();
-                    }),
-                    child: Text(
-                      'Get sha512 result',
-                      textScaleFactor: 1.5,
+                child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(30)
+                            )
+                        ),
+                        hintText: 'text to hash'
                     )
                 )
             )
 
           ],
+
         )
-      )
     );
   }
 }
