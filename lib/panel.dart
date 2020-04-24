@@ -135,12 +135,11 @@ class PanelState extends State<Panel> {
             ),
 
             Text(
-              '${hashSize}',
+              '$hashSize',
               textAlign: TextAlign.center,
               textScaleFactor: 2,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Open Sans'
+                fontWeight: FontWeight.bold
               ),
             )
 
