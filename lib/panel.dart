@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'controller.dart';
 
@@ -60,17 +61,28 @@ class PanelState extends State<Panel> {
                 )
               )
             ),
-
             //display the hash
             Padding(
               padding: EdgeInsets.all(20.0),
               child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0)
+                ),
                 child: Padding(
                   padding: EdgeInsets.all(20.0),
                   child: Container(
-                    child: SelectableText(
-                      hasher.getHash(),
-                      textAlign: TextAlign.center,
+                    child: InkWell(
+                      onTap: () => Clipboard.setData(ClipboardData(text: hasher.getHash())),
+                      child: ListTile(
+                        title: Text(
+                          hasher.getHash(),
+                          textAlign: TextAlign.center,
+                        ),
+                        subtitle: Text(
+                          'Click the hash to copy it',
+                          textAlign: TextAlign.center
+                        )
+                      )
                     )
                   )
                 )
@@ -92,7 +104,8 @@ class PanelState extends State<Panel> {
                       textScaleFactor: 1.5,
                     )
                 )
-            ),
+            )
+
           ],
         )
       )
