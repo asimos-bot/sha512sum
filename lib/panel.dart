@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Panel extends StatefulWidget {
 
@@ -20,6 +21,11 @@ class PanelState extends State<Panel> {
 
   PanelState() {
     hash = hintText;
+
+    //try to read hashSize from disk, if it fails, assign 128 to it
+    SharedPreferences.getInstance()
+        .then((data) => setState(() => hashSize = data.getInt('hashSize') ?? 128))
+        .catchError((error) => setState(() => hashSize = 128));
   }
 
   bool passwd=true;
@@ -43,9 +49,12 @@ class PanelState extends State<Panel> {
     super.initState();
   }
   //dispose controller
-  void dispose() {
+  void dispose() async {
 
     _controller.dispose();
+    print("HELLLLLLLLOOOOOOOO");
+    //save hashSize to disk
+    await SharedPreferences.getInstance().then((data) => data.setInt('hashSize', hashSize));
     super.dispose();
   }
 
@@ -126,8 +135,11 @@ class PanelState extends State<Panel> {
               child: Slider(
                 min: 1,
                 max: 128,
-                onChanged: (newValue) {
+                onChanged: (newValue) async {
                   hashSize = newValue.round();
+                  await SharedPreferences.getInstance().then((data) async {
+                    data.setInt('hashSize', hashSize); //update hashSize
+                  });
                   updateHash();
                 },
                 value: hashSize.toDouble()
